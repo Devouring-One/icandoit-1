@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://b4y0tki0br2hg"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cycpc"]
+
+[node name="Fireball" type="Area2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_cycpc")
+debug_color = Color(0.84705883, 0, 0.105882354, 0.4745098)

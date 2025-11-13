@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="Force" load_steps=2 format=3 uid="uid://xjqkacwsdfk2"]
+
+[ext_resource type="Script" uid="uid://dr6vb3pufoy77" path="res://Data/force.gd" id="1_kn0xs"]
+
+[resource]
+script = ExtResource("1_kn0xs")
