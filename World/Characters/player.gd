@@ -2,7 +2,10 @@ class_name Player
 extends CharacterBody2D
 
 @export var SPEED = 200
-@export var _forces: Array[Force] = []
+@export var mass: float = 1.0
+var _forces: Array[Force] = []
+
+const FIREBALL_SCENE := preload("res://World/Spells/fireball.tscn")
 
 var _target_position: Vector2 = Vector2.ZERO
 var _has_target: bool = false
@@ -41,6 +44,9 @@ func _input(event: InputEvent) -> void:
 			if _draw_node:
 				_draw_node.queue_redraw()
 
+	if event.is_action_pressed("spell_slot_1") and not event.is_echo():
+		_cast_fireball()
+
 func _draw_target_marker() -> void:
 	if not _has_target or not _draw_node:
 		return
@@ -66,8 +72,7 @@ func _physics_process(delta: float) -> void:
 	
 	for i in range(_forces.size() - 1, -1, -1):
 		var force: Force = _forces[i]
-		var contribution: Vector2 = force.advance(delta)
-		forces_velocity += contribution
+		forces_velocity += force.get_current_force() / mass
 		
 		if force.is_finished():
 			_forces.remove_at(i)
@@ -75,7 +80,7 @@ func _physics_process(delta: float) -> void:
 	var forces_magnitude = forces_velocity.length()
 	var target_weight = 1.0
 	if forces_magnitude > 0:
-		target_weight = clamp(1.0 - (forces_magnitude / SPEED), 0.3, 1.0)
+		target_weight = clamp(1.0 - (forces_magnitude / SPEED), 0.1, 1.0)
 	
 	if _has_target:
 		var to_target = _target_position - global_position
@@ -97,3 +102,14 @@ func _physics_process(delta: float) -> void:
 	_debug_final_velocity = velocity
 	
 	move_and_slide()
+
+func _cast_fireball() -> void:
+	var mouse_position = get_global_mouse_position()
+	var direction = mouse_position - global_position
+	if direction.length_squared() == 0.0:
+		direction = Vector2.RIGHT
+
+	var fireball: Fireball = FIREBALL_SCENE.instantiate()
+	fireball.global_position = global_position
+	fireball.launch(direction, self)
+	get_parent().add_child(fireball)

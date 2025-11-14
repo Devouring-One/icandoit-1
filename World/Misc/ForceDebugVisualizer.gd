@@ -25,7 +25,7 @@ func _draw() -> void:
 	
 	if show_individual_forces and debug_data.has("forces"):
 		for force in debug_data.forces:
-			var force_vec = force.get_force_strength(force._elapsed_time)
+			var force_vec = force.get_current_force()
 			if force_vec != Vector2.ZERO:
 				draw_line(Vector2.ZERO, force_vec * scale_factor, Color.YELLOW, thickness * 0.7)
 	

@@ -1,11 +1,12 @@
 class_name Explosion
 extends Area2D
 
-@export var max_damage: float = 50.0
-@export var max_force: float = 500.0
-@export var radius: float = 100.0
-@export var force_duration: float = 0.3
-@export var knockback_curve: Curve
+@export var max_damage: float = 10.0
+@export var max_force: float = 100.0
+@export var radius: float = 400.0
+@export var force_base_duration: float = 2.0  ## Base duration for all forces
+@export var force_duration_coefficient: float = 0.0  ## Extra duration per force magnitude (0 = disabled)
+@export var falloff_exponent: float = 1.0  ## 1.0 = linear, 2.0 = quadratic, 0.5 = square root
 
 func _ready() -> void:
     %CollisionShape2D.shape.radius = radius
@@ -40,6 +41,7 @@ func _apply_explosion(body: Node2D) -> void:
                 break
     
     var falloff = clamp(1.0 - (effective_distance / radius), 0.0, 1.0)
+    falloff = pow(falloff, falloff_exponent)
     
     if body.has_method("take_damage"):
         body.take_damage(max_damage * falloff)
@@ -48,7 +50,10 @@ func _apply_explosion(body: Node2D) -> void:
         var force = Force.new(
             direction,
             max_force * falloff,
-            force_duration,
-            knockback_curve if knockback_curve else Force._make_default_curve()
+            force_base_duration,
+            body,
+            force_duration_coefficient,
+            Tween.TRANS_SINE,
+            Tween.EASE_OUT
         )
         body.add_force(force)

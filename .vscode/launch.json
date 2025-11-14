@@ -13,7 +13,8 @@
             "project": "${workspaceFolder}",
             "address": "127.0.0.1",
             "port": 6007,
-            "scene": "main|current|pinned|<path>",
+            // scene - main | current | pinned | <path>
+            "scene": "main",
             "editor_path": "C:\\Users\\nuke\\Downloads\\Godot_v4.6-dev3_mono_win64\\Godot_v4.6-dev3_mono_win64.exe",
             // engine command line flags
             "profiling": false,
@@ -24,9 +25,9 @@
             "debug_avoidance": false,
             "debug_stringnames": false,
             "frame_delay": 0,
-            "time_scale": 0.125,
-            "disable_vsync": false,
-            "fixed_fps": 60,
+            "time_scale": 1.0,
+            "disable_vsync": true,
+            //"fixed_fps": 60,
             // anything else
             "additional_options": ""
         }

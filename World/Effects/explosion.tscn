@@ -4,14 +4,14 @@
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_xslbu"]
 
-[node name="Explosion" type="Area2D"]
+[node name="Explosion" type="Area2D" unique_id=704464758]
 collision_layer = 2
 script = ExtResource("1_dof0w")
-max_force = 250.0
-radius = 30.0
-force_duration = 1.0
+max_force = 200.0
+radius = 75.0
+falloff_exponent = 0.49
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=544975632]
 unique_name_in_owner = true
 shape = SubResource("CircleShape2D_xslbu")
 debug_color = Color(0.75686276, 0.45490196, 0, 0.41960785)

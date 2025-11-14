@@ -1,50 +1,36 @@
 class_name Force
-extends Resource
+extends RefCounted
 
 @export var _vector: Vector2 = Vector2.ZERO
 @export var _magnitude: float = 0.0
 @export var _duration: float = 0.0
-@export var _curve : Curve = _make_default_curve()
-var _elapsed_time: float = 0.0
+@export var _current_strength: float = 1.0
+@export var _is_finished: bool = false
+var _tween: Tween = null
+var _node: Node = null
+@export var _trans_type: Tween.TransitionType = Tween.TRANS_CUBIC
+@export var _ease_type: Tween.EaseType = Tween.EASE_OUT
 
-func _init(vector: Vector2 = Vector2.ZERO, magnitude: float = 0.0, duration: float = 0.0, curve: Curve = _make_default_curve()) -> void:
-	_vector = vector
+func _init(vector: Vector2, magnitude: float, base_duration: float, node: Node, duration_coefficient: float = 0.0, trans_type: Tween.TransitionType = Tween.TRANS_CUBIC, ease_type: Tween.EaseType = Tween.EASE_OUT) -> void:
+	_vector = vector.normalized()
 	_magnitude = magnitude
-	_duration = duration
-	_curve = curve
-	_elapsed_time = 0.0
+	_duration = base_duration + (magnitude * duration_coefficient)
+	_node = node
+	_trans_type = trans_type
+	_ease_type = ease_type
+	
+	_tween = node.create_tween()
+	_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
+	_tween.tween_property(self, "_current_strength", 0.0, _duration).set_trans(_trans_type).set_ease(_ease_type)
+	_tween.finished.connect(_on_tween_finished)
 
-func get_force_strength(time: float) -> Vector2:
-	if _duration <= 0.0:
+func get_current_force() -> Vector2:
+	if _is_finished:
 		return Vector2.ZERO
-
-	var normalized_time: float = clamp(time / _duration, 0.0, 1.0)
-	var curve_value: float = _curve.sample_baked(normalized_time)
-	return _vector * _magnitude * curve_value
-
-func advance(delta: float) -> Vector2:
-	_elapsed_time += delta
-	return get_force_strength(_elapsed_time)
-
-func reset_elapsed_time() -> void:
-	_elapsed_time = 0.0
+	return _vector * _magnitude * _current_strength
 
 func is_finished() -> bool:
-	return _duration > 0.0 and _elapsed_time >= _duration
+	return _is_finished
 
-static func _make_default_curve() -> Curve:
-	var curve := Curve.new()
-	curve.add_point(
-		Vector2(0.0, 1.0),
-		0.0, -1.0,
-		Curve.TANGENT_LINEAR,
-		Curve.TANGENT_FREE
-	)
-	curve.add_point(
-		Vector2(1.0, 0.0),
-		0.0, 0.0,
-		Curve.TANGENT_FREE,
-		Curve.TANGENT_LINEAR
-	)
-	curve.bake()
-	return curve
+func _on_tween_finished() -> void:
+	_is_finished = true

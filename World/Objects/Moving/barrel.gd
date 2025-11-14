@@ -1,22 +1,20 @@
 class_name Barrel
 extends CharacterBody2D
 
+@export var mass: float = 4.0
 var _forces: Array[Force] = []
 var _debug_forces_velocity: Vector2 = Vector2.ZERO
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	var forces_velocity = Vector2.ZERO
 	
-	# Собираем все силы
 	for i in range(_forces.size() - 1, -1, -1):
 		var force: Force = _forces[i]
-		var contribution: Vector2 = force.advance(delta)
-		forces_velocity += contribution
+		forces_velocity += force.get_current_force() / mass
 		
 		if force.is_finished():
 			_forces.remove_at(i)
 	
-	# Применяем напрямую к velocity (как у игрока)
 	velocity = forces_velocity
 	_debug_forces_velocity = forces_velocity
 	move_and_slide()
