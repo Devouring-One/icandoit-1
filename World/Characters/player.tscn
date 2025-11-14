@@ -14,6 +14,7 @@ script = ExtResource("1_lcdnr")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=495604856]
 shape = SubResource("CircleShape2D_neurf")
+debug_color = Color(0, 0.6, 0, 0.41960785)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=851743301]
 
