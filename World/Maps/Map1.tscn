@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://fef64om76474"]
 
-[ext_resource type="PackedScene" uid="uid://d38q86l6cv2yg" path="res://World/Characters/player.tscn" id="1_pm8x6"]
-[ext_resource type="PackedScene" uid="uid://dfbuyhgt0sr43" path="res://World/Objects/Static/barrel.tscn" id="2_xgctd"]
+[ext_resource type="PackedScene" uid="uid://d38q86l6cv2yg" path="res://World/Objects/Characters/player.tscn" id="1_pm8x6"]
+[ext_resource type="PackedScene" uid="uid://dfbuyhgt0sr43" path="res://World/Objects/Moving/barrel.tscn" id="2_xgctd"]
 
 [node name="Map1" type="Node2D" unique_id=2098230543]
 
@@ -12,10 +12,10 @@ position = Vector2(432, 295)
 position = Vector2(431, 238)
 
 [node name="Barrel2" parent="." unique_id=1138162188 instance=ExtResource("2_xgctd")]
-position = Vector2(241, 490)
+position = Vector2(248, 490)
 
 [node name="Barrel3" parent="." unique_id=1473904371 instance=ExtResource("2_xgctd")]
-position = Vector2(213, 441)
+position = Vector2(216, 434)
 
 [node name="Barrel4" parent="." unique_id=389418080 instance=ExtResource("2_xgctd")]
 position = Vector2(559, 159)

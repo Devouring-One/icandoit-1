@@ -2,10 +2,9 @@ class_name Fireball
 extends Area2D
 
 @export var speed: float = 600.0
+@export var damage: float = 10.0
 @export var max_distance: float = 600.0
 @export var auto_explode_on_area: bool = true
-
-const EXPLOSION_SCENE := preload("res://World/Effects/explosion.tscn")
 
 var _direction: Vector2 = Vector2.ZERO
 var _distance_traveled: float = 0.0
@@ -36,6 +35,8 @@ func _physics_process(delta: float) -> void:
 func _on_body_entered(body: Node) -> void:
 	if body == _owner:
 		return
+	if body.has_method("apply_damage"):
+		body.apply_damage(damage)
 	_explode()
 
 func _on_area_entered(area: Area2D) -> void:
@@ -50,7 +51,7 @@ func _explode() -> void:
 	call_deferred("_spawn_explosion")
 
 func _spawn_explosion() -> void:
-	var explosion = EXPLOSION_SCENE.instantiate()
+	var explosion = Explosion.new()
 	explosion.global_position = global_position
 	get_tree().current_scene.add_child(explosion)
 	queue_free()

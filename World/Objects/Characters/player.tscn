@@ -1,0 +1,44 @@
+[gd_scene load_steps=6 format=3 uid="uid://d38q86l6cv2yg"]
+
+[ext_resource type="Script" uid="uid://u7o8iary110f" path="res://World/Objects/Characters/player.gd" id="1_lcdnr"]
+[ext_resource type="PackedScene" uid="uid://112g2xcefbth" path="res://World/Objects/Components/UI/Misc/force_debug_visualizer.tscn" id="2_neurf"]
+[ext_resource type="PackedScene" uid="uid://d1f5axvmfq0qi" path="res://World/Objects/Components/UI/health_bar_display.tscn" id="3_1s6mf"]
+[ext_resource type="PackedScene" uid="uid://1gpk0rnfx8ri" path="res://World/Objects/Components/EntityComponent.tscn" id="4_vd3ux"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_neurf"]
+radius = 24.0
+
+[node name="Player" type="CharacterBody2D" unique_id=235688838]
+collision_mask = 3
+motion_mode = 1
+wall_min_slide_angle = 0.0
+script = ExtResource("1_lcdnr")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=495604856]
+shape = SubResource("CircleShape2D_neurf")
+debug_color = Color(0, 0.6, 0, 0.41960785)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=851743301]
+
+[node name="DebugDrawLayer" type="Control" parent="CanvasLayer" unique_id=483610805]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ForceDebugVisualizer" parent="." unique_id=2080032926 instance=ExtResource("2_neurf")]
+
+[node name="RegenTimer" type="Timer" parent="." unique_id=1103765169]
+unique_name_in_owner = true
+autostart = true
+
+[node name="HealthBarDisplay" parent="." unique_id=817281336 instance=ExtResource("3_1s6mf")]
+position = Vector2(0, 32)
+
+[node name="EntityComponent" parent="." unique_id=782134215 instance=ExtResource("4_vd3ux")]
+unique_name_in_owner = true
+entity_name = "Player"
+health_bar_offset = Vector2(0, 32)
+
+[connection signal="timeout" from="RegenTimer" to="." method="_on_regen_timer_timeout"]

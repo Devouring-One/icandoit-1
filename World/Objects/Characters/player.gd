@@ -2,18 +2,13 @@ class_name Player
 extends CharacterBody2D
 
 @export var SPEED = 200
-@export var mass: float = 1.0
-var _forces: Array[Force] = []
-
-const FIREBALL_SCENE := preload("res://World/Spells/fireball.tscn")
+@export var FIREBALL_SCENE: PackedScene = preload("res://World/Spells/fireball.tscn")
 
 var _target_position: Vector2 = Vector2.ZERO
 var _has_target: bool = false
 var _draw_node: Control = null
 
-var _debug_target_velocity: Vector2 = Vector2.ZERO
-var _debug_forces_velocity: Vector2 = Vector2.ZERO
-var _debug_final_velocity: Vector2 = Vector2.ZERO
+@onready var _entity_component: EntityComponent = %EntityComponent
 
 func _ready() -> void:
 	_draw_node = %DebugDrawLayer
@@ -23,18 +18,24 @@ func _ready() -> void:
 	
 	_draw_node.draw.connect(_draw_target_marker)
 
+	if not _entity_component:
+		push_warning("EntityComponent not found; stats will not be shared")
+	else:
+		_entity_component.health_changed.connect(_on_health_changed)
+
+
 func _clear_forces():
-	_forces.clear()
+	if _entity_component:
+		_entity_component.clear_forces()
 
 func add_force(force: Force) -> void:
-	if not force._vector == Vector2.ZERO:
-		_forces.append(force)
+	if _entity_component:
+		_entity_component.add_force(force)
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			var explosion_scene = preload("res://World/Effects/explosion.tscn")
-			var explosion = explosion_scene.instantiate()
+			var explosion: Explosion = Explosion.new()
 			explosion.global_position = get_global_mouse_position()
 			get_parent().add_child(explosion)
 		
@@ -59,23 +60,15 @@ func _draw_target_marker() -> void:
 	_draw_node.draw_line(_target_position + Vector2(0, -size), _target_position + Vector2(0, size), color, thickness)
 
 func _get_forces_for_debug() -> Dictionary:
-	return {
-		"forces": _forces,
-		"target_velocity": _debug_target_velocity,
-		"forces_velocity": _debug_forces_velocity,
-		"velocity": _debug_final_velocity
-	}
+	if _entity_component:
+		return _entity_component.get_debug_snapshot()
+	return {}
 
 func _physics_process(delta: float) -> void:
 	var target_velocity = Vector2.ZERO
 	var forces_velocity = Vector2.ZERO
-	
-	for i in range(_forces.size() - 1, -1, -1):
-		var force: Force = _forces[i]
-		forces_velocity += force.get_current_force() / mass
-		
-		if force.is_finished():
-			_forces.remove_at(i)
+	if _entity_component:
+		forces_velocity = _entity_component.get_forces_velocity()
 	
 	var forces_magnitude = forces_velocity.length()
 	var target_weight = 1.0
@@ -95,11 +88,10 @@ func _physics_process(delta: float) -> void:
 			var speed_this_frame = min(SPEED, distance / delta)
 			target_velocity = to_target.normalized() * speed_this_frame * target_weight
 	
-	velocity = target_velocity + forces_velocity
-	
-	_debug_target_velocity = target_velocity
-	_debug_forces_velocity = forces_velocity
-	_debug_final_velocity = velocity
+	if _entity_component:
+		velocity = _entity_component.apply_forces_to(target_velocity)
+	else:
+		velocity = target_velocity + forces_velocity
 	
 	move_and_slide()
 
@@ -113,3 +105,19 @@ func _cast_fireball() -> void:
 	fireball.global_position = global_position
 	fireball.launch(direction, self)
 	get_parent().add_child(fireball)
+
+func _on_regen_timer_timeout() -> void:
+	if _entity_component:
+		_entity_component.heal(1.0)
+
+func apply_damage(amount: float) -> void:
+	if not _entity_component:
+		return
+	_entity_component.apply_damage(amount)
+	if _entity_component.get_health() <= 0.0:
+		print("Player has died.")
+		if has_node("%RegenTimer"):
+			%RegenTimer.stop()
+
+func _on_health_changed(_current: float, _max: float) -> void:
+	pass  # hook for future VFX/logic
