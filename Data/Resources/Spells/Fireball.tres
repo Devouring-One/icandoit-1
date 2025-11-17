@@ -15,12 +15,14 @@ projectile_speed = 400.0
 
 [sub_resource type="Resource" id="damage_behavior"]
 script = ExtResource("4_dmg_script")
-damage = 15.0
+damage = 5.0
 
 [sub_resource type="Resource" id="explosion_behavior"]
 script = ExtResource("5_expl_script")
 explosion_scene = ExtResource("6_expl_scene")
+explosion_radius = 100.0
 explosion_force = 400.0
+explosion_damage = 10.0
 
 [resource]
 script = ExtResource("1_gufcn")

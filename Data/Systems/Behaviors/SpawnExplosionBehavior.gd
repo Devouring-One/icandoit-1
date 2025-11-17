@@ -4,6 +4,7 @@ extends "res://Data/Systems/SpellBehavior.gd"
 @export var explosion_scene: PackedScene
 @export var explosion_radius: float = 100.0
 @export var explosion_force: float = 300.0
+@export var explosion_damage: float = 5.0
 
 func on_impact(projectile: Node2D, _hit_body: Node2D, _spell: Spell) -> void:
 	_spawn_explosion(projectile.global_position)
@@ -36,7 +37,7 @@ func _spawn_explosion(at_position: Vector2) -> void:
 	
 	# Configure before adding to tree
 	if explosion.has_method("setup"):
-		explosion.setup(explosion_radius, explosion_force)
+		explosion.setup(explosion_radius, explosion_force, explosion_damage)
 	
 	# Defer adding to scene to avoid "flushing queries" error
 	world.call_deferred("add_child", explosion)

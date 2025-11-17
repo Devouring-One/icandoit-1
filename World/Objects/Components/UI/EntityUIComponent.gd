@@ -1,9 +1,6 @@
 class_name EntityUIComponent
 extends Node2D
 
-signal cast_started(duration: float)
-signal cast_cancelled
-
 @export_group("Health Bar")
 @export var show_health_bar: bool = true
 @export var health_bar_offset: Vector2 = Vector2(0, -48)
