@@ -1,14 +1,30 @@
-[gd_resource type="Resource" script_class="Spell" load_steps=3 format=3 uid="uid://b3v68nyor0t27"]
+[gd_resource type="Resource" script_class="Spell" load_steps=11 format=3 uid="uid://b3v68nyor0t27"]
 
 [ext_resource type="Script" uid="uid://dja5udwxjcj6y" path="res://Data/Resources/Spells/Spell.gd" id="1_gufcn"]
-[ext_resource type="PackedScene" uid="uid://b4y0tki0br2hg" path="res://World/Spells/fireball.tscn" id="2_qrril"]
+[ext_resource type="Script" uid="uid://coidgjpfs2b2d" path="res://Data/Systems/SpellBehavior.gd" id="1_qrril"]
+[ext_resource type="Script" uid="uid://dmr7nspson14n" path="res://Data/Systems/Behaviors/ProjectileBehavior.gd" id="2_proj_script"]
+[ext_resource type="PackedScene" path="res://World/Spells/Projectile.tscn" id="3_proj_scene"]
+[ext_resource type="Script" uid="uid://dpiupsqdn0vhx" path="res://Data/Systems/Behaviors/DamageOnImpactBehavior.gd" id="4_dmg_script"]
+[ext_resource type="Script" uid="uid://bmtv3n1vo0yvs" path="res://Data/Systems/Behaviors/SpawnExplosionBehavior.gd" id="5_expl_script"]
+[ext_resource type="PackedScene" uid="uid://bn0epvcr0x5iy" path="res://World/Effects/explosion.tscn" id="6_expl_scene"]
+
+[sub_resource type="Resource" id="projectile_behavior"]
+script = ExtResource("2_proj_script")
+projectile_scene = ExtResource("3_proj_scene")
+projectile_speed = 400.0
+
+[sub_resource type="Resource" id="damage_behavior"]
+script = ExtResource("4_dmg_script")
+damage = 15.0
+
+[sub_resource type="Resource" id="explosion_behavior"]
+script = ExtResource("5_expl_script")
+explosion_scene = ExtResource("6_expl_scene")
+explosion_force = 400.0
 
 [resource]
 script = ExtResource("1_gufcn")
 name = "Fireball"
-area_of_effect = 100.0
-damage = 5.0
-speed = 200.0
-cooldown = 5.0
-description = "Concentrated fire energy that explodes on impact and deals "
-spell_scene = ExtResource("2_qrril")
+cooldown = 3.0
+description = "Launches a fiery projectile that explodes on impact, dealing damage and pushing enemies away."
+behaviors = Array[ExtResource("1_qrril")]([SubResource("projectile_behavior"), SubResource("damage_behavior"), SubResource("explosion_behavior")])

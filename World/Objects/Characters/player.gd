@@ -82,24 +82,15 @@ func _cast_spell(spell: Spell) -> void:
 			print("Spell %s is on cooldown" % spell.name)
 			return
 	
-	# Get direction
-	var mouse_position: Vector2 = get_global_mouse_position()
-	var direction: Vector2 = mouse_position - global_position
-	if direction.length_squared() == 0.0:
-		direction = Vector2.from_angle(randf() * TAU)
-	
 	# Apply cast time delay
 	if spell.cast_time > 0.0:
 		if _entity_ui:
 			_entity_ui.start_cast(spell.cast_time)
 		await get_tree().create_timer(spell.cast_time).timeout
 	
-	# Spawn spell
-	var spell_instance: Node = spell.spell_scene.instantiate()
-	spell_instance.global_position = global_position
-	if spell_instance.has_method("launch"):
-		spell_instance.launch(direction, self)
-	get_parent().add_child(spell_instance)
+	# Cast spell using modular behaviors
+	var target_pos: Vector2 = get_global_mouse_position()
+	spell.cast(self, target_pos)
 	
 	# Set cooldown
 	_spell_cooldowns[spell.name] = current_time + spell.cooldown

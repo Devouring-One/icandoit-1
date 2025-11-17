@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SpawnExplosionBehavior" load_steps=3 format=3 uid="uid://deqn50h8t34k3"]
+
+[ext_resource type="Script" uid="uid://bmtv3n1vo0yvs" path="res://Data/Systems/Behaviors/SpawnExplosionBehavior.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bn0epvcr0x5iy" path="res://World/Effects/explosion.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+explosion_scene = ExtResource("2")
