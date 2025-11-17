@@ -31,10 +31,12 @@ func _spawn_explosion(at_position: Vector2) -> void:
 		explosion.queue_free()
 		return
 	
-	# Add to scene FIRST
-	world.add_child(explosion)
+	# Set position before adding to tree
 	explosion.global_position = at_position
 	
-	# Then configure (after it's in tree)
+	# Configure before adding to tree
 	if explosion.has_method("setup"):
 		explosion.setup(explosion_radius, explosion_force)
+	
+	# Defer adding to scene to avoid "flushing queries" error
+	world.call_deferred("add_child", explosion)
