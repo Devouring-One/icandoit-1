@@ -82,14 +82,16 @@ func _cast_spell(spell: Spell) -> void:
 			print("Spell %s is on cooldown" % spell.name)
 			return
 	
+	# Capture target position BEFORE cast time
+	var target_pos: Vector2 = get_global_mouse_position()
+	
 	# Apply cast time delay
 	if spell.cast_time > 0.0:
 		if _entity_ui:
 			_entity_ui.start_cast(spell.cast_time)
 		await get_tree().create_timer(spell.cast_time).timeout
 	
-	# Cast spell using modular behaviors
-	var target_pos: Vector2 = get_global_mouse_position()
+	# Cast spell using captured position
 	spell.cast(self, target_pos)
 	
 	# Set cooldown
