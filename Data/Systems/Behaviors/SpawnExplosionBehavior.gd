@@ -7,10 +7,12 @@ extends "res://Data/Systems/SpellBehavior.gd"
 @export var explosion_damage: float = 5.0
 
 func on_impact(projectile: Node2D, _hit_body: Node2D, _spell: Spell) -> void:
-	_spawn_explosion(projectile.global_position)
+	if projectile:
+		_spawn_explosion(projectile.global_position)
 
 func on_expire(projectile: Node2D, _spell: Spell) -> void:
-	_spawn_explosion(projectile.global_position)
+	if projectile:
+		_spawn_explosion(projectile.global_position)
 
 func _spawn_explosion(at_position: Vector2) -> void:
 	if not explosion_scene:

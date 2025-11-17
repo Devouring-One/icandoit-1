@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Spell" load_steps=8 format=3 uid="uid://bros8026vnrrb"]
+
+[ext_resource type="Script" uid="uid://dja5udwxjcj6y" path="res://Data/Resources/Spells/Spell.gd" id="1_spell"]
+[ext_resource type="Script" uid="uid://coidgjpfs2b2d" path="res://Data/Systems/SpellBehavior.gd" id="1_xdtbp"]
+[ext_resource type="Script" uid="uid://yhrjnpqy00md" path="res://Data/Systems/Behaviors/RaycastBehavior.gd" id="2_ray"]
+[ext_resource type="Script" uid="uid://bmtv3n1vo0yvs" path="res://Data/Systems/Behaviors/SpawnExplosionBehavior.gd" id="4_expl"]
+[ext_resource type="PackedScene" uid="uid://bn0epvcr0x5iy" path="res://World/Effects/explosion.tscn" id="5_expl_scene"]
+
+[sub_resource type="Resource" id="raycast_behavior"]
+script = ExtResource("2_ray")
+
+[sub_resource type="Resource" id="explosion_behavior"]
+script = ExtResource("4_expl")
+explosion_scene = ExtResource("5_expl_scene")
+explosion_radius = 50.0
+explosion_force = 800.0
+explosion_damage = 3.0
+
+[resource]
+script = ExtResource("1_spell")
+name = "Bolt"
+cooldown = 1.5
+cast_time = 0.2
+description = "Fires an instant ray that creates a small explosion at hit point, pushing enemies away with great force."
+behaviors = Array[ExtResource("1_xdtbp")]([SubResource("raycast_behavior"), SubResource("explosion_behavior")])

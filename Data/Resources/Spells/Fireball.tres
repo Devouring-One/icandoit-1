@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dja5udwxjcj6y" path="res://Data/Resources/Spells/Spell.gd" id="1_gufcn"]
 [ext_resource type="Script" uid="uid://coidgjpfs2b2d" path="res://Data/Systems/SpellBehavior.gd" id="1_qrril"]
 [ext_resource type="Script" uid="uid://dmr7nspson14n" path="res://Data/Systems/Behaviors/ProjectileBehavior.gd" id="2_proj_script"]
-[ext_resource type="PackedScene" path="res://World/Spells/Projectile.tscn" id="3_proj_scene"]
+[ext_resource type="PackedScene" uid="uid://c6ec247qqkjyi" path="res://World/Spells/Projectile.tscn" id="3_proj_scene"]
 [ext_resource type="Script" uid="uid://dpiupsqdn0vhx" path="res://Data/Systems/Behaviors/DamageOnImpactBehavior.gd" id="4_dmg_script"]
 [ext_resource type="Script" uid="uid://bmtv3n1vo0yvs" path="res://Data/Systems/Behaviors/SpawnExplosionBehavior.gd" id="5_expl_script"]
 [ext_resource type="PackedScene" uid="uid://bn0epvcr0x5iy" path="res://World/Effects/explosion.tscn" id="6_expl_scene"]
@@ -20,7 +20,6 @@ damage = 5.0
 [sub_resource type="Resource" id="explosion_behavior"]
 script = ExtResource("5_expl_script")
 explosion_scene = ExtResource("6_expl_scene")
-explosion_radius = 100.0
 explosion_force = 400.0
 explosion_damage = 10.0
 

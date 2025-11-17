@@ -7,5 +7,5 @@ script = ExtResource("1_3pp3t")
 base_folder = "res://Data/Resources/Spells"
 includes = Array[String](["*.tres"])
 excludes = Array[String](["all_*.tres"])
-paths = Array[String](["res://Data/Resources/Spells/Fireball.tres"])
+paths = Array[String](["res://Data/Resources/Spells/Bolt.tres", "res://Data/Resources/Spells/Fireball.tres"])
 metadata/_custom_type_script = "uid://c0aakupa1ujn5"

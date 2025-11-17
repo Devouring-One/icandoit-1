@@ -43,6 +43,9 @@ func _input(event: InputEvent) -> void:
 
 	if event.is_action_pressed("spell_slot_1") and not event.is_echo():
 		_cast_spell(spell_book[0] if spell_book.size() > 0 else null)
+	
+	if event.is_action_pressed("spell_slot_2") and not event.is_echo():
+		_cast_spell(spell_book[1] if spell_book.size() > 1 else null)
 
 func _draw_target_marker() -> void:
 	if not _has_target or not _draw_node:

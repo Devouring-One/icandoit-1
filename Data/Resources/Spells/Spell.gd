@@ -1,16 +1,6 @@
 class_name Spell extends Resource
 
 @export var name: String = "New Spell"
-@export var mana_cost: float = 10.0
-@export var spell_range: float = 300.0
-
-enum SpellType {
-	OFFENSIVE,
-	DEFENSIVE,
-	UTILITY
-}
-
-@export var type: SpellType = SpellType.OFFENSIVE
 @export var cooldown: float = 1.0
 @export var cast_time: float = 0.5
 @export var description: String = "A powerful spell."
