@@ -6,7 +6,8 @@ var _has_target: bool = false
 var _draw_node: Control = null
 var _spell_cooldowns: Dictionary = {}  # spell_name -> cooldown_end_time
 
-@export var spell_book: Array[Spell] = []
+@export var all_spells: ResourceGroup
+var spell_book: Array[Spell] = []
 
 @onready var _entity_component: EntityComponent = %EntityComponent
 @onready var _entity_ui: EntityUIComponent = %EntityUIComponent
@@ -24,6 +25,8 @@ func _ready() -> void:
 	else:
 		_entity_component.health_changed.connect(_on_health_changed)
 		_entity_component.died.connect(_on_entity_died)
+	
+	all_spells.load_all_into(spell_book)
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

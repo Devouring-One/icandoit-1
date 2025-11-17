@@ -1,20 +1,19 @@
-[gd_scene load_steps=7 format=3 uid="uid://d38q86l6cv2yg"]
+[gd_scene load_steps=6 format=3 uid="uid://d38q86l6cv2yg"]
 
 [ext_resource type="Script" uid="uid://u7o8iary110f" path="res://World/Objects/Characters/player.gd" id="1_lcdnr"]
-[ext_resource type="Script" uid="uid://dja5udwxjcj6y" path="res://Data/Resources/Spells/Spell.gd" id="2_bmh8k"]
-[ext_resource type="Resource" uid="uid://b3v68nyor0t27" path="res://Data/Resources/Spells/Fireball.tres" id="3_jmav7"]
+[ext_resource type="Resource" uid="uid://gu1idybvyorv" path="res://Data/Resources/Spells/all_spells.tres" id="2_m6685"]
 [ext_resource type="PackedScene" uid="uid://f3su3rbskta2" path="res://World/Objects/Components/UI/EntityUIComponent.tscn" id="4_m6685"]
 [ext_resource type="PackedScene" uid="uid://1gpk0rnfx8ri" path="res://World/Objects/Components/EntityComponent.tscn" id="4_vd3ux"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_neurf"]
 radius = 24.0
 
-[node name="Player" type="CharacterBody2D" unique_id=235688838]
+[node name="Player2" type="CharacterBody2D" unique_id=235688838]
 collision_mask = 3
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_lcdnr")
-spell_book = Array[ExtResource("2_bmh8k")]([ExtResource("3_jmav7")])
+all_spells = ExtResource("2_m6685")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=495604856]
 shape = SubResource("CircleShape2D_neurf")
