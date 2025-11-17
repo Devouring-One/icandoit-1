@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://112g2xcefbth"]
-
-[ext_resource type="Script" uid="uid://cc2up6p2wfay1" path="res://World/Misc/ForceDebugVisualizer.gd" id="1_oijlx"]
-
-[node name="ForceDebugVisualizer" type="Node2D" unique_id=2080032926]
-script = ExtResource("1_oijlx")

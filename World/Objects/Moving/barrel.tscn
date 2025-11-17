@@ -1,8 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dfbuyhgt0sr43"]
 
 [ext_resource type="Script" uid="uid://j20888ngueix" path="res://World/Objects/Moving/barrel.gd" id="1_arj2g"]
-[ext_resource type="PackedScene" uid="uid://112g2xcefbth" path="res://World/Misc/force_debug_visualizer.tscn" id="2_mkdl2"]
-[ext_resource type="PackedScene" uid="uid://d1f5axvmfq0qi" path="res://World/Objects/Components/UI/health_bar_display.tscn" id="3_slr4x"]
+[ext_resource type="PackedScene" uid="uid://f3su3rbskta2" path="res://World/Objects/Components/UI/EntityUIComponent.tscn" id="4_2cqhv"]
 [ext_resource type="PackedScene" uid="uid://1gpk0rnfx8ri" path="res://World/Objects/Components/EntityComponent.tscn" id="4_cwa4x"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_pm8x6"]
@@ -17,17 +16,13 @@ script = ExtResource("1_arj2g")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1682420587]
 shape = SubResource("CircleShape2D_pm8x6")
 
-[node name="ForceDebugVisualizer" parent="." unique_id=2080032926 instance=ExtResource("2_mkdl2")]
-
-[node name="HealthBarDisplay" parent="." unique_id=1808305731 instance=ExtResource("3_slr4x")]
-position = Vector2(0, 40)
-
 [node name="EntityComponent" parent="." unique_id=1328460198 instance=ExtResource("4_cwa4x")]
 unique_name_in_owner = true
 entity_name = "Barrel"
 max_health = 50.0
 health = 50.0
 mass = 4.0
-health_bar_offset = Vector2(0, 40)
-spawn_health_bar = true
-destroy_owner_on_death = false
+destroy_owner_on_death = true
+
+[node name="EntityUIComponent" parent="." unique_id=2062721715 instance=ExtResource("4_2cqhv")]
+unique_name_in_owner = true

@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://d38q86l6cv2yg"]
+[gd_scene load_steps=7 format=3 uid="uid://d38q86l6cv2yg"]
 
 [ext_resource type="Script" uid="uid://u7o8iary110f" path="res://World/Objects/Characters/player.gd" id="1_lcdnr"]
-[ext_resource type="PackedScene" uid="uid://112g2xcefbth" path="res://World/Objects/Components/UI/Misc/force_debug_visualizer.tscn" id="2_neurf"]
-[ext_resource type="PackedScene" uid="uid://d1f5axvmfq0qi" path="res://World/Objects/Components/UI/health_bar_display.tscn" id="3_1s6mf"]
+[ext_resource type="Script" uid="uid://dja5udwxjcj6y" path="res://Data/Resources/Spells/Spell.gd" id="2_bmh8k"]
+[ext_resource type="Resource" uid="uid://b3v68nyor0t27" path="res://Data/Resources/Spells/Fireball.tres" id="3_jmav7"]
+[ext_resource type="PackedScene" uid="uid://f3su3rbskta2" path="res://World/Objects/Components/UI/EntityUIComponent.tscn" id="4_m6685"]
 [ext_resource type="PackedScene" uid="uid://1gpk0rnfx8ri" path="res://World/Objects/Components/EntityComponent.tscn" id="4_vd3ux"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_neurf"]
@@ -13,6 +14,7 @@ collision_mask = 3
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_lcdnr")
+spell_book = Array[ExtResource("2_bmh8k")]([ExtResource("3_jmav7")])
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=495604856]
 shape = SubResource("CircleShape2D_neurf")
@@ -27,18 +29,16 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="ForceDebugVisualizer" parent="." unique_id=2080032926 instance=ExtResource("2_neurf")]
-
 [node name="RegenTimer" type="Timer" parent="." unique_id=1103765169]
 unique_name_in_owner = true
 autostart = true
 
-[node name="HealthBarDisplay" parent="." unique_id=817281336 instance=ExtResource("3_1s6mf")]
-position = Vector2(0, 32)
-
 [node name="EntityComponent" parent="." unique_id=782134215 instance=ExtResource("4_vd3ux")]
 unique_name_in_owner = true
 entity_name = "Player"
-health_bar_offset = Vector2(0, 32)
+regen_enabled = true
 
-[connection signal="timeout" from="RegenTimer" to="." method="_on_regen_timer_timeout"]
+[node name="EntityUIComponent" parent="." unique_id=2062721715 instance=ExtResource("4_m6685")]
+unique_name_in_owner = true
+
+[connection signal="timeout" from="RegenTimer" to="EntityComponent" method="_on_regen_timer_timeout"]

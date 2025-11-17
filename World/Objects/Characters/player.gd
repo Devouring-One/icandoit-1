@@ -1,14 +1,15 @@
 class_name Player
 extends CharacterBody2D
 
-@export var SPEED = 200
-@export var FIREBALL_SCENE: PackedScene = preload("res://World/Spells/fireball.tscn")
-
 var _target_position: Vector2 = Vector2.ZERO
 var _has_target: bool = false
 var _draw_node: Control = null
+var _spell_cooldowns: Dictionary = {}  # spell_name -> cooldown_end_time
+
+@export var spell_book: Array[Spell] = []
 
 @onready var _entity_component: EntityComponent = %EntityComponent
+@onready var _entity_ui: EntityUIComponent = %EntityUIComponent
 
 func _ready() -> void:
 	_draw_node = %DebugDrawLayer
@@ -22,15 +23,7 @@ func _ready() -> void:
 		push_warning("EntityComponent not found; stats will not be shared")
 	else:
 		_entity_component.health_changed.connect(_on_health_changed)
-
-
-func _clear_forces():
-	if _entity_component:
-		_entity_component.clear_forces()
-
-func add_force(force: Force) -> void:
-	if _entity_component:
-		_entity_component.add_force(force)
+		_entity_component.died.connect(_on_entity_died)
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
@@ -46,7 +39,7 @@ func _input(event: InputEvent) -> void:
 				_draw_node.queue_redraw()
 
 	if event.is_action_pressed("spell_slot_1") and not event.is_echo():
-		_cast_fireball()
+		_cast_spell(spell_book[0] if spell_book.size() > 0 else null)
 
 func _draw_target_marker() -> void:
 	if not _has_target or not _draw_node:
@@ -59,65 +52,59 @@ func _draw_target_marker() -> void:
 	_draw_node.draw_line(_target_position + Vector2(-size, 0), _target_position + Vector2(size, 0), color, thickness)
 	_draw_node.draw_line(_target_position + Vector2(0, -size), _target_position + Vector2(0, size), color, thickness)
 
-func _get_forces_for_debug() -> Dictionary:
-	if _entity_component:
-		return _entity_component.get_debug_snapshot()
-	return {}
-
 func _physics_process(delta: float) -> void:
-	var target_velocity = Vector2.ZERO
-	var forces_velocity = Vector2.ZERO
-	if _entity_component:
-		forces_velocity = _entity_component.get_forces_velocity()
+	if not _entity_component:
+		move_and_slide()
+		return
 	
-	var forces_magnitude = forces_velocity.length()
-	var target_weight = 1.0
-	if forces_magnitude > 0:
-		target_weight = clamp(1.0 - (forces_magnitude / SPEED), 0.1, 1.0)
+	velocity = _entity_component.compute_velocity(_target_position, _has_target, delta)
 	
-	if _has_target:
-		var to_target = _target_position - global_position
-		var distance = to_target.length()
-		
-		if distance <= 2.0:
-			global_position = _target_position
-			_has_target = false
-			if _draw_node:
-				_draw_node.queue_redraw()
-		else:
-			var speed_this_frame = min(SPEED, distance / delta)
-			target_velocity = to_target.normalized() * speed_this_frame * target_weight
-	
-	if _entity_component:
-		velocity = _entity_component.apply_forces_to(target_velocity)
-	else:
-		velocity = target_velocity + forces_velocity
+	if _has_target and (_target_position - global_position).length() <= 2.0:
+		global_position = _target_position
+		_has_target = false
+		if _draw_node:
+			_draw_node.queue_redraw()
 	
 	move_and_slide()
 
-func _cast_fireball() -> void:
-	var mouse_position = get_global_mouse_position()
-	var direction = mouse_position - global_position
-	if direction.length_squared() == 0.0:
-		direction = Vector2.RIGHT
 
-	var fireball: Fireball = FIREBALL_SCENE.instantiate()
-	fireball.global_position = global_position
-	fireball.launch(direction, self)
-	get_parent().add_child(fireball)
-
-func _on_regen_timer_timeout() -> void:
-	if _entity_component:
-		_entity_component.heal(1.0)
-
-func apply_damage(amount: float) -> void:
-	if not _entity_component:
+func _cast_spell(spell: Spell) -> void:
+	if spell == null:
 		return
-	_entity_component.apply_damage(amount)
-	if _entity_component.get_health() <= 0.0:
-		print("Player has died.")
-		if has_node("%RegenTimer"):
-			%RegenTimer.stop()
+	
+	# Check cooldown
+	var current_time: float = Time.get_ticks_msec() / 1000.0
+	if _spell_cooldowns.has(spell.name):
+		if current_time < _spell_cooldowns[spell.name]:
+			print("Spell %s is on cooldown" % spell.name)
+			return
+	
+	# Get direction
+	var mouse_position: Vector2 = get_global_mouse_position()
+	var direction: Vector2 = mouse_position - global_position
+	if direction.length_squared() == 0.0:
+		direction = Vector2.from_angle(randf() * TAU)
+	
+	# Apply cast time delay
+	if spell.cast_time > 0.0:
+		if _entity_ui:
+			_entity_ui.start_cast(spell.cast_time)
+		await get_tree().create_timer(spell.cast_time).timeout
+	
+	# Spawn spell
+	var spell_instance: Node = spell.spell_scene.instantiate()
+	spell_instance.global_position = global_position
+	if spell_instance.has_method("launch"):
+		spell_instance.launch(direction, self)
+	get_parent().add_child(spell_instance)
+	
+	# Set cooldown
+	_spell_cooldowns[spell.name] = current_time + spell.cooldown
 
 func _on_health_changed(_current: float, _max: float) -> void:
 	pass  # hook for future VFX/logic
+
+func _on_entity_died() -> void:
+	print("Player has died.")
+	if has_node("%RegenTimer"):
+		%RegenTimer.stop()

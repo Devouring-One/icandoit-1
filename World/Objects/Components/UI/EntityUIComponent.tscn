@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://f3su3rbskta2"]
+
+[ext_resource type="Script" uid="uid://bbph0cf6gdb80" path="res://World/Objects/Components/UI/EntityUIComponent.gd" id="1_6y5uj"]
+
+[node name="EntityUIComponent" type="Node2D" unique_id=2062721715]
+script = ExtResource("1_6y5uj")
+cast_bar_offset = Vector2(0, -32)
+cast_bar_size = Vector2(48, 3)
+metadata/_custom_type_script = "uid://bbph0cf6gdb80"

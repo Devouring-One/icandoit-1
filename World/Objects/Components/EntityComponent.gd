@@ -4,44 +4,42 @@ extends Node
 signal health_changed(current_health: float, max_health: float)
 signal died
 
-const DEFAULT_HEALTH_BAR := preload("res://World/Objects/Components/UI/health_bar_display.tscn")
-
 @export_group("Identity")
 @export var entity_name: String = "Unnamed Entity"
-@export_multiline var entity_description: String = "No description available."
-@export var entity_icon: Texture2D = null
 
 @export_group("Stats")
 @export var max_health: float = 100.0
 @export var health: float = 100.0
-@export var movement_speed: float = 200.0
 @export var mass: float = 1.0
-@export var can_move: bool = true
-
-@export_group("Health UI")
-@export var spawn_health_bar: bool = true
-@export var health_bar_offset: Vector2 = Vector2(0, -48)
-@export var health_bar_scene: PackedScene = DEFAULT_HEALTH_BAR
-@export var show_health_label: bool = true
-@export var destroy_owner_on_death: bool = false
+@export var movement_speed: float = 200.0
 
 @export_group("Gameplay")
-@export var abilities: Array[String] = []
-@export var resistances: Dictionary = {}
+@export var destroy_owner_on_death: bool = false
+
+@export_group("Regeneration")
+@export var regen_enabled: bool = false
+@export var regen_amount: float = 1.0
 
 var forces: Array[Force] = []
-var _health_bar: HealthBarDisplay = null
 var _owner_body: Node = null
 var _last_forces_velocity: Vector2 = Vector2.ZERO
 var _last_target_velocity: Vector2 = Vector2.ZERO
 var _last_final_velocity: Vector2 = Vector2.ZERO
 var _last_forces_frame: int = -1
 
+static func get_from(node: Node) -> EntityComponent:
+	if node == null:
+		return null
+	if node is EntityComponent:
+		return node
+	for child in node.get_children():
+		if child is EntityComponent:
+			return child
+	return null
+
 func _ready() -> void:
 	_owner_body = get_parent()
 	health = clamp(health, 0.0, max_health)
-	_ensure_health_bar()
-	_update_health_bar()
 
 func add_force(force: Force) -> void:
 	if force == null:
@@ -49,9 +47,6 @@ func add_force(force: Force) -> void:
 	if force._vector == Vector2.ZERO:
 		return
 	forces.append(force)
-
-func clear_forces() -> void:
-	forces.clear()
 
 func get_forces_velocity() -> Vector2:
 	_ensure_forces_updated()
@@ -61,6 +56,28 @@ func apply_forces_to(base_velocity: Vector2) -> Vector2:
 	_ensure_forces_updated()
 	_last_target_velocity = base_velocity
 	_last_final_velocity = base_velocity + _last_forces_velocity
+	return _last_final_velocity
+
+func compute_velocity(target_position: Vector2, has_target: bool, delta: float) -> Vector2:
+	_ensure_forces_updated()
+	
+	var target_velocity := Vector2.ZERO
+	var forces_magnitude := _last_forces_velocity.length()
+	var target_weight := 1.0
+	
+	if forces_magnitude > 0:
+		target_weight = clamp(1.0 - (forces_magnitude / movement_speed), 0.1, 1.0)
+	
+	if has_target and is_instance_valid(_owner_body):
+		var to_target: Vector2 = target_position - _owner_body.global_position
+		var distance: float = to_target.length()
+		
+		if distance > 2.0:
+			var speed_this_frame: float = min(movement_speed, distance / delta)
+			target_velocity = to_target.normalized() * speed_this_frame * target_weight
+	
+	_last_target_velocity = target_velocity
+	_last_final_velocity = target_velocity + _last_forces_velocity
 	return _last_final_velocity
 
 func apply_damage(amount: float) -> void:
@@ -73,15 +90,14 @@ func heal(amount: float) -> void:
 		return
 	_set_health(health + amount)
 
-func set_health_exact(value: float) -> void:
-	_set_health(value)
+func is_alive() -> bool:
+	return health > 0.0
 
 func _set_health(value: float) -> void:
 	var new_value = clamp(value, 0.0, max_health)
 	if is_equal_approx(new_value, health):
 		return
 	health = new_value
-	_update_health_bar()
 	health_changed.emit(health, max_health)
 	if health <= 0.0:
 		died.emit()
@@ -91,19 +107,7 @@ func _set_health(value: float) -> void:
 func set_max_health(value: float) -> void:
 	max_health = max(value, 0.001)
 	health = clamp(health, 0.0, max_health)
-	_update_health_bar()
-
-func get_health() -> float:
-	return health
-
-func get_max_health() -> float:
-	return max_health
-
-func get_mass() -> float:
-	return max(mass, 0.001)
-
-func get_forces() -> Array:
-	return forces
+	health_changed.emit(health, max_health)
 
 func get_debug_snapshot() -> Dictionary:
 	return {
@@ -113,23 +117,14 @@ func get_debug_snapshot() -> Dictionary:
 		"velocity": _last_final_velocity
 	}
 
-func _ensure_health_bar() -> void:
-	if not spawn_health_bar:
+func _on_regen_timer_timeout() -> void:
+	if not regen_enabled:
 		return
-	if not is_instance_valid(_owner_body):
+	if regen_amount <= 0.0:
 		return
-	_health_bar = _owner_body.get_node_or_null("HealthBarDisplay")
-	if not is_instance_valid(_health_bar) and health_bar_scene:
-		_health_bar = health_bar_scene.instantiate()
-		_health_bar.name = "HealthBarDisplay"
-		_owner_body.add_child(_health_bar)
-	if is_instance_valid(_health_bar):
-		_health_bar.position = health_bar_offset
-		_health_bar.show_label = show_health_label
-
-func _update_health_bar() -> void:
-	if is_instance_valid(_health_bar):
-		_health_bar.set_health(health, max_health)
+	if health <= 0.0:
+		return
+	heal(regen_amount)
 
 func _ensure_forces_updated() -> void:
 	var frame := Engine.get_physics_frames()

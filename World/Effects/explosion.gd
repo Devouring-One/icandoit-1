@@ -51,19 +51,25 @@ func _apply_explosion(body: Node2D) -> void:
     var falloff = clamp(1.0 - (effective_distance / radius), 0.0, 1.0)
     falloff = pow(falloff, falloff_exponent)
     
-    if body.has_method("apply_damage"):
-        body.apply_damage(max_damage * falloff)
-    
-    if body.has_method("add_force"):
-        var force = Force.new(
-            direction,
-            max_force * falloff,
-            force_base_duration,
-            body,
-            force_duration_coefficient,
-            Tween.TRANS_SINE,
-            Tween.EASE_OUT
-        )
+    var component := EntityComponent.get_from(body)
+    if component:
+        component.apply_damage(max_damage * falloff)
+    else:
+        if body.has_method("apply_damage"):
+            body.apply_damage(max_damage * falloff)
+
+    var force = Force.new(
+        direction,
+        max_force * falloff,
+        force_base_duration,
+        body,
+        force_duration_coefficient,
+        Tween.TRANS_SINE,
+        Tween.EASE_OUT
+    )
+    if component:
+        component.add_force(force)
+    elif body.has_method("add_force"):
         body.add_force(force)
 
 func _ensure_collision_shape() -> void:

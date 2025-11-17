@@ -35,8 +35,9 @@ func _physics_process(delta: float) -> void:
 func _on_body_entered(body: Node) -> void:
 	if body == _owner:
 		return
-	if body.has_method("apply_damage"):
-		body.apply_damage(damage)
+	var component := EntityComponent.get_from(body)
+	if component:
+		component.apply_damage(damage)
 	_explode()
 
 func _on_area_entered(area: Area2D) -> void:
