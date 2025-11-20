@@ -24,6 +24,7 @@ enum CastType {
 
 @export_group("Nested Spells")
 @export var on_hit: SpellEventConfig
+@export var on_bounce: SpellEventConfig
 @export var on_expire: SpellEventConfig
 @export var on_tick: SpellEventConfig
 @export var tick_interval: float = 0.5
@@ -35,16 +36,16 @@ func _validate_property(property: Dictionary) -> void:
 			if property.name in ["raycast_config", "area_radius", "area_force"]:
 				property.usage = PROPERTY_USAGE_NO_EDITOR
 		CastType.RAYCAST:
-			if property.name in ["projectile_config", "area_radius", "area_force", "on_expire", "on_tick", "tick_interval"]:
+			if property.name in ["projectile_config", "area_radius", "area_force", "on_bounce", "on_expire", "on_tick", "tick_interval"]:
 				property.usage = PROPERTY_USAGE_NO_EDITOR
 		CastType.AREA:
-			if property.name in ["projectile_config", "raycast_config", "on_expire", "on_tick", "tick_interval"]:
+			if property.name in ["projectile_config", "raycast_config", "on_bounce", "on_expire", "on_tick", "tick_interval"]:
 				property.usage = PROPERTY_USAGE_NO_EDITOR
 		CastType.INSTANT:
-			if property.name in ["projectile_config", "raycast_config", "area_radius", "area_force", "on_expire", "on_tick", "tick_interval"]:
+			if property.name in ["projectile_config", "raycast_config", "area_radius", "area_force", "on_bounce", "on_expire", "on_tick", "tick_interval"]:
 				property.usage = PROPERTY_USAGE_NO_EDITOR
 		CastType.CHANNELING, CastType.BUFF:
-			if property.name in ["projectile_config", "raycast_config", "area_radius", "area_force", "on_hit", "on_expire", "on_tick", "tick_interval"]:
+			if property.name in ["projectile_config", "raycast_config", "area_radius", "area_force", "on_hit", "on_bounce", "on_expire", "on_tick", "tick_interval"]:
 				property.usage = PROPERTY_USAGE_NO_EDITOR
 
 ## Cast the spell from caster towards target position
@@ -82,9 +83,27 @@ func _cast_projectile(caster: Node2D, target_position: Vector2) -> void:
 		projectile.affected_by_forces = projectile_config.affected_by_forces
 		projectile.force_influence = projectile_config.force_influence
 		
+		# Apply bounce config
+		projectile.can_bounce = projectile_config.can_bounce
+		projectile.max_bounces = projectile_config.max_bounces
+		projectile.bounce_from_bodies = projectile_config.bounce_from_bodies
+		projectile.bounce_from_projectiles = projectile_config.bounce_from_projectiles
+		projectile.bounce_speed_multiplier = projectile_config.bounce_speed_multiplier
+		
+		# Apply speed animation config
+		projectile.animate_speed = projectile_config.animate_speed
+		projectile.target_speed = projectile_config.target_speed
+		projectile.speed_transition_duration = projectile_config.speed_transition_duration
+		projectile.speed_trans_type = projectile_config.speed_trans_type
+		projectile.speed_ease_type = projectile_config.speed_ease_type
+		
 		# Calculate spread
 		var angle_offset: float = 0.0
-		if projectile_config.projectile_count > 1:
+		if projectile_config.omnidirectional:
+			# Distribute evenly around 360 degrees
+			var angle_step: float = TAU / float(projectile_config.projectile_count)
+			angle_offset = angle_step * float(i)
+		elif projectile_config.projectile_count > 1:
 			var step: float = projectile_config.spread_angle / float(projectile_config.projectile_count - 1)
 			angle_offset = -projectile_config.spread_angle / 2.0 + step * float(i)
 		
@@ -94,6 +113,9 @@ func _cast_projectile(caster: Node2D, target_position: Vector2) -> void:
 		# Connect nested spell events
 		projectile.impacted.connect(func(body: Node2D):
 			_trigger_event(on_hit, projectile, projectile.global_position, body)
+		)
+		projectile.bounced.connect(func(body: Node2D):
+			_trigger_event(on_bounce, projectile, projectile.global_position, body)
 		)
 		projectile.expired.connect(func():
 			_trigger_event(on_expire, projectile, projectile.global_position, null)
@@ -179,14 +201,53 @@ func _trigger_event(event_config: SpellEventConfig, source: Node2D, position: Ve
 		if component:
 			component.apply_damage(event_config.damage_amount)
 	
+	# Apply force to target
+	if event_config.apply_force and target:
+		var direction: Vector2 = (target.global_position - position).normalized()
+		if direction.length_squared() < 0.01:
+			# If target is at same position, use source direction
+			if source.has_method("get") and source.get("direction") != null:
+				direction = source.direction
+			else:
+				direction = Vector2.RIGHT
+		
+		var force := Force.new(
+			direction,
+			event_config.force_magnitude,
+			event_config.force_duration,
+			target,
+			0.0,  # force_duration_coefficient
+			Tween.TRANS_SINE,
+			Tween.EASE_OUT
+		)
+		
+		# Try EntityComponent first, then ForceReceiver
+		var component := EntityComponent.get_from(target)
+		if component:
+			component.add_force(force)
+		else:
+			for child in target.get_children():
+				if child is ForceReceiver:
+					child.add_force(force)
+					break
+	
 	# Cast nested spell
-	if event_config.nested_spell:
-		# For nested spells, generate a target position ahead of source
-		var target_pos: Vector2 = position
-		if source.has_method("get") and source.get("direction") != null:
-			# If source has direction (like Projectile), use it
-			target_pos = position + source.direction * 100.0
-		elif source is Node2D and position == source.global_position:
-			# Otherwise use source rotation
-			target_pos = position + Vector2.RIGHT.rotated(source.rotation) * 100.0
-		event_config.nested_spell.cast(source, target_pos)
+	if event_config.nested_spells and event_config.nested_spells.size() > 0:
+		for nested_resource in event_config.nested_spells:
+			var nested := nested_resource as Spell
+			if not nested:
+				continue
+			
+			# For nested spells, generate appropriate target position
+			var target_pos: Vector2 = position
+			
+			# PROJECTILE needs direction, AREA/INSTANT need exact position
+			if nested.cast_type == CastType.PROJECTILE:
+				if source.has_method("get") and source.get("direction") != null:
+					# If source has direction (like Projectile), use it
+					target_pos = position + source.direction * 100.0
+				elif source is Node2D and position == source.global_position:
+					# Otherwise use source rotation
+					target_pos = position + Vector2.RIGHT.rotated(source.rotation) * 100.0
+			
+			nested.cast(source, target_pos)
