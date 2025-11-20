@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="Spell" load_steps=9 format=3 uid="uid://dr56fo32q2dtb"]
+
+[ext_resource type="Script" uid="uid://bedj7vauqtlh5" path="res://Data/Systems/Spell.gd" id="1_lqb6k"]
+[ext_resource type="Script" uid="uid://cyjakym6ftikj" path="res://Data/Systems/ProjectileConfig.gd" id="1_ofnsn"]
+[ext_resource type="Script" uid="uid://y37wki2urje6" path="res://Data/Systems/SpellEventConfig.gd" id="3_4w8i6"]
+
+[sub_resource type="Resource" id="Resource_4sgab"]
+script = ExtResource("1_ofnsn")
+lifetime = 2.0
+projectile_count = 15
+spread_angle = 0.2617993877991494
+metadata/_custom_type_script = "uid://cyjakym6ftikj"
+
+[sub_resource type="Resource" id="Resource_qy2yc"]
+script = ExtResource("1_lqb6k")
+cast_type = 0
+projectile_config = SubResource("Resource_4sgab")
+metadata/_custom_type_script = "uid://bedj7vauqtlh5"
+
+[sub_resource type="Resource" id="Resource_0lhdp"]
+script = ExtResource("3_4w8i6")
+nested_spell = SubResource("Resource_qy2yc")
+metadata/_custom_type_script = "uid://y37wki2urje6"
+
+[sub_resource type="Resource" id="Resource_gl3xg"]
+script = ExtResource("3_4w8i6")
+apply_damage = true
+damage_amount = 10.0
+metadata/_custom_type_script = "uid://y37wki2urje6"
+
+[sub_resource type="Resource" id="Resource_owiei"]
+script = ExtResource("1_ofnsn")
+lifetime = 1.0
+projectile_count = 3
+spread_angle = 0.7853981633974483
+metadata/_custom_type_script = "uid://cyjakym6ftikj"
+
+[resource]
+script = ExtResource("1_lqb6k")
+cast_type = 0
+projectile_config = SubResource("Resource_owiei")
+on_hit = SubResource("Resource_gl3xg")
+on_expire = SubResource("Resource_0lhdp")
+metadata/_custom_type_script = "uid://bedj7vauqtlh5"
