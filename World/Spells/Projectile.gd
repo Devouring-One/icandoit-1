@@ -123,6 +123,10 @@ func _on_area_entered(area: Area2D) -> void:
 	if area == self or area == caster:
 		return
 	
+	# Only collide with other projectiles, ignore other areas (like explosions)
+	if not area is Projectile:
+		return
+	
 	_handle_collision(area, false)
 
 func _handle_collision(collider: Node2D, is_body: bool) -> void:
