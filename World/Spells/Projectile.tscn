@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://c6ec247qqkjyi"]
+[gd_scene load_steps=5 format=3 uid="uid://c6ec247qqkjyi"]
 
 [ext_resource type="Script" uid="uid://v0r7te15abqh" path="res://World/Spells/Projectile.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://rujsrcpspdic" path="res://icon.svg" id="2"]
+[ext_resource type="Script" uid="uid://ds3om1fh1rcr6" path="res://World/Spells/Helpers/ForceReceiver.gd" id="3"]
 
 [sub_resource type="CircleShape2D" id="1"]
 radius = 8.0
@@ -10,6 +11,10 @@ radius = 8.0
 collision_layer = 4
 collision_mask = 3
 script = ExtResource("1")
+debug_draw = true
+
+[node name="ForceReceiver" type="Node" parent="." unique_id=551112343]
+script = ExtResource("3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=966072185]
 shape = SubResource("1")

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Spell" load_steps=9 format=3 uid="uid://by58yf61la7cm"]
+
+[ext_resource type="Script" uid="uid://coidgjpfs2b2d" path="res://Data/Systems/SpellBehavior.gd" id="1_ladpn"]
+[ext_resource type="Script" uid="uid://dmr7nspson14n" path="res://Data/Systems/Behaviors/ProjectileBehavior.gd" id="2_21hhb"]
+[ext_resource type="PackedScene" uid="uid://c6ec247qqkjyi" path="res://World/Spells/Projectile.tscn" id="2_77ffc"]
+[ext_resource type="Script" uid="uid://bedj7vauqtlh5" path="res://Data/Systems/Spell.gd" id="2_ssg82"]
+[ext_resource type="Script" uid="uid://dio5syulon0fo" path="res://Data/Systems/Behaviors/CastSpellOnImpactBehavior.gd" id="4_m2qum"]
+[ext_resource type="Resource" uid="uid://b3v68nyor0t27" path="res://Data/Resources/Spells/Fireball.tres" id="5_rfftq"]
+
+[sub_resource type="Resource" id="Resource_77ffc"]
+script = ExtResource("2_21hhb")
+projectile_scene = ExtResource("2_77ffc")
+projectile_lifetime = 1.0
+projectile_count = 11
+spread_angle = 0.5235987755982988
+metadata/_custom_type_script = "uid://dmr7nspson14n"
+
+[sub_resource type="Resource" id="Resource_lqcbr"]
+script = ExtResource("4_m2qum")
+spell_to_cast = ExtResource("5_rfftq")
+cast_on_expire = true
+metadata/_custom_type_script = "uid://dio5syulon0fo"
+
+[resource]
+script = ExtResource("2_ssg82")
+behaviors = Array[ExtResource("1_ladpn")]([SubResource("Resource_77ffc"), SubResource("Resource_lqcbr")])
+metadata/_custom_type_script = "uid://bedj7vauqtlh5"

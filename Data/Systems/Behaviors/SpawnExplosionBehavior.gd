@@ -1,5 +1,5 @@
 class_name SpawnExplosionBehavior
-extends "res://Data/Systems/SpellBehavior.gd"
+extends SpellBehavior
 
 @export var explosion_scene: PackedScene
 @export var explosion_radius: float = 100.0
@@ -40,6 +40,10 @@ func _spawn_explosion(at_position: Vector2) -> void:
 	# Configure before adding to tree
 	if explosion.has_method("setup"):
 		explosion.setup(explosion_radius, explosion_force, explosion_damage)
+	
+	# Make explosion affect projectiles too
+	if "collision_mask_bits" in explosion:
+		explosion.collision_mask_bits = 5  # Hit bodies (1) + projectiles (4)
 	
 	# Defer adding to scene to avoid "flushing queries" error
 	world.call_deferred("add_child", explosion)

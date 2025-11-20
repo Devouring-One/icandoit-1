@@ -33,6 +33,7 @@ func _input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			var explosion: Explosion = Explosion.new()
 			explosion.global_position = get_global_mouse_position()
+			explosion.collision_mask_bits = 5  # Hit bodies (1) + projectiles (4)
 			get_parent().add_child(explosion)
 		
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
@@ -41,11 +42,9 @@ func _input(event: InputEvent) -> void:
 			if _draw_node:
 				_draw_node.queue_redraw()
 
-	if event.is_action_pressed("spell_slot_1") and not event.is_echo():
-		_cast_spell(spell_book[0] if spell_book.size() > 0 else null)
-	
-	if event.is_action_pressed("spell_slot_2") and not event.is_echo():
-		_cast_spell(spell_book[1] if spell_book.size() > 1 else null)
+	for i in 10:
+		if event.is_action_pressed("spell_slot_%d" % (i + 1)) and not event.is_echo():
+			_cast_spell(spell_book[i] if spell_book.size() > i else null)
 
 func _draw_target_marker() -> void:
 	if not _has_target or not _draw_node:
@@ -105,5 +104,3 @@ func _on_health_changed(_current: float, _max: float) -> void:
 
 func _on_entity_died() -> void:
 	print("Player has died.")
-	if has_node("%RegenTimer"):
-		%RegenTimer.stop()

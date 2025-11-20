@@ -1,7 +1,7 @@
 class_name Spell extends Resource
 
 @export var name: String = "New Spell"
-@export var cooldown: float = 1.0
+@export var cooldown: float = 0.5
 @export var cast_time: float = 0.5
 @export var description: String = "A powerful spell."
 @export var spell_icon: Texture2D = null

@@ -8,7 +8,7 @@ extends Area2D
 @export var force_duration_coefficient: float = 0.0  ## Extra duration per force magnitude (0 = disabled)
 @export var falloff_exponent: float = 1.0  ## 1.0 = linear, 2.0 = quadratic, 0.5 = square root
 @export var collision_layer_bits: int = 2
-@export var collision_mask_bits: int = 1
+@export var collision_mask_bits: int = 5  ## 1 (bodies) + 4 (projectiles)
 @export var debug_color: Color = Color(0.75686276, 0.45490196, 0, 0.41960785)
 
 var _collision_shape: CollisionShape2D
@@ -28,8 +28,13 @@ func _ready() -> void:
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	
+	# Apply to bodies (players, enemies, etc)
 	for body in get_overlapping_bodies():
 		_apply_explosion(body)
+	
+	# Apply to areas (projectiles, etc)
+	for area in get_overlapping_areas():
+		_apply_explosion(area)
 	
 	_collision_shape.disabled = true
 	_collision_shape.debug_color = Color(1, 1, 0, 0.1)
@@ -72,10 +77,19 @@ func _apply_explosion(body: Node2D) -> void:
 		Tween.TRANS_SINE,
 		Tween.EASE_OUT
 	)
+	
+	# Try adding to EntityComponent first, then ForceReceiver
 	if component:
 		component.add_force(force)
-	elif body.has_method("add_force"):
-		body.add_force(force)
+	else:
+		# Check for ForceReceiver (projectiles)
+		for child in body.get_children():
+			if child is ForceReceiver:
+				child.add_force(force)
+				break
+		# Fallback to legacy method
+		if body.has_method("add_force"):
+			body.add_force(force)
 
 func _ensure_collision_shape() -> void:
 	if not is_instance_valid(_collision_shape):

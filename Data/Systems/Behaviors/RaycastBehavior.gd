@@ -1,5 +1,5 @@
 class_name RaycastBehavior
-extends "res://Data/Systems/SpellBehavior.gd"
+extends SpellBehavior
 
 @export var max_range: float = 1000.0
 @export var collision_mask: int = 1  ## Which layers to hit (enemies, walls, etc)
@@ -21,7 +21,6 @@ func on_cast(caster: Node2D, target_position: Vector2, spell: Spell) -> Node2D:
 	
 	var result: Dictionary = space_state.intersect_ray(query)
 	
-	# Determine hit position
 	var hit_position: Vector2
 	var hit_body: Node2D = null
 	

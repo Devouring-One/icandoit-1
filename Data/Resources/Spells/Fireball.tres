@@ -1,31 +1,31 @@
 [gd_resource type="Resource" script_class="Spell" load_steps=11 format=3 uid="uid://b3v68nyor0t27"]
 
-[ext_resource type="Script" uid="uid://dja5udwxjcj6y" path="res://Data/Resources/Spells/Spell.gd" id="1_gufcn"]
 [ext_resource type="Script" uid="uid://coidgjpfs2b2d" path="res://Data/Systems/SpellBehavior.gd" id="1_qrril"]
-[ext_resource type="Script" uid="uid://dmr7nspson14n" path="res://Data/Systems/Behaviors/ProjectileBehavior.gd" id="2_proj_script"]
-[ext_resource type="PackedScene" uid="uid://c6ec247qqkjyi" path="res://World/Spells/Projectile.tscn" id="3_proj_scene"]
-[ext_resource type="Script" uid="uid://dpiupsqdn0vhx" path="res://Data/Systems/Behaviors/DamageOnImpactBehavior.gd" id="4_dmg_script"]
-[ext_resource type="Script" uid="uid://bmtv3n1vo0yvs" path="res://Data/Systems/Behaviors/SpawnExplosionBehavior.gd" id="5_expl_script"]
-[ext_resource type="PackedScene" uid="uid://bn0epvcr0x5iy" path="res://World/Effects/explosion.tscn" id="6_expl_scene"]
+[ext_resource type="PackedScene" uid="uid://c6ec247qqkjyi" path="res://World/Spells/Projectile.tscn" id="2_du2nx"]
+[ext_resource type="Script" uid="uid://dmr7nspson14n" path="res://Data/Systems/Behaviors/ProjectileBehavior.gd" id="2_qqjta"]
+[ext_resource type="Script" uid="uid://bedj7vauqtlh5" path="res://Data/Systems/Spell.gd" id="2_qrril"]
+[ext_resource type="Script" uid="uid://dpiupsqdn0vhx" path="res://Data/Systems/Behaviors/DamageOnImpactBehavior.gd" id="3_du2nx"]
+[ext_resource type="Script" uid="uid://bmtv3n1vo0yvs" path="res://Data/Systems/Behaviors/SpawnExplosionBehavior.gd" id="4_reywg"]
+[ext_resource type="PackedScene" uid="uid://bn0epvcr0x5iy" path="res://World/Effects/explosion.tscn" id="5_reywg"]
 
-[sub_resource type="Resource" id="projectile_behavior"]
-script = ExtResource("2_proj_script")
-projectile_scene = ExtResource("3_proj_scene")
-projectile_speed = 400.0
+[sub_resource type="Resource" id="Resource_mt3l1"]
+script = ExtResource("2_qqjta")
+projectile_scene = ExtResource("2_du2nx")
+projectile_lifetime = 1.0
+metadata/_custom_type_script = "uid://dmr7nspson14n"
 
-[sub_resource type="Resource" id="damage_behavior"]
-script = ExtResource("4_dmg_script")
+[sub_resource type="Resource" id="Resource_dbc5v"]
+script = ExtResource("3_du2nx")
 damage = 5.0
+metadata/_custom_type_script = "uid://dpiupsqdn0vhx"
 
-[sub_resource type="Resource" id="explosion_behavior"]
-script = ExtResource("5_expl_script")
-explosion_scene = ExtResource("6_expl_scene")
-explosion_force = 400.0
-explosion_damage = 10.0
+[sub_resource type="Resource" id="Resource_rtcwg"]
+script = ExtResource("4_reywg")
+explosion_scene = ExtResource("5_reywg")
+metadata/_custom_type_script = "uid://bmtv3n1vo0yvs"
 
 [resource]
-script = ExtResource("1_gufcn")
+script = ExtResource("2_qrril")
 name = "Fireball"
-cooldown = 3.0
-description = "Launches a fiery projectile that explodes on impact, dealing damage and pushing enemies away."
-behaviors = Array[ExtResource("1_qrril")]([SubResource("projectile_behavior"), SubResource("damage_behavior"), SubResource("explosion_behavior")])
+cooldown = 0.5
+behaviors = Array[ExtResource("1_qrril")]([SubResource("Resource_mt3l1"), SubResource("Resource_dbc5v"), SubResource("Resource_rtcwg")])

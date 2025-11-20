@@ -19,8 +19,10 @@ signal died
 @export_group("Regeneration")
 @export var regen_enabled: bool = false
 @export var regen_amount: float = 1.0
+@export var regen_interval: float = 1.0
 
 var forces: Array[Force] = []
+var _regen_timer: Timer = null
 var _owner_body: Node = null
 var _last_forces_velocity: Vector2 = Vector2.ZERO
 var _last_target_velocity: Vector2 = Vector2.ZERO
@@ -40,6 +42,14 @@ static func get_from(node: Node) -> EntityComponent:
 func _ready() -> void:
 	_owner_body = get_parent()
 	health = clamp(health, 0.0, max_health)
+	
+	# Setup internal regen timer
+	if regen_enabled:
+		_regen_timer = Timer.new()
+		_regen_timer.wait_time = regen_interval
+		_regen_timer.autostart = true
+		_regen_timer.timeout.connect(_on_regen_timer_timeout)
+		add_child(_regen_timer)
 
 func add_force(force: Force) -> void:
 	if force == null:
@@ -100,6 +110,8 @@ func _set_health(value: float) -> void:
 	health = new_value
 	health_changed.emit(health, max_health)
 	if health <= 0.0:
+		if _regen_timer:
+			_regen_timer.stop()
 		died.emit()
 		if destroy_owner_on_death and is_instance_valid(_owner_body):
 			_owner_body.queue_free()

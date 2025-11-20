@@ -1,5 +1,5 @@
 class_name DamageOnImpactBehavior
-extends "res://Data/Systems/SpellBehavior.gd"
+extends SpellBehavior
 
 @export var damage: float = 10.0
 

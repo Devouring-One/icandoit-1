@@ -8,7 +8,7 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_neurf"]
 radius = 24.0
 
-[node name="Player2" type="CharacterBody2D" unique_id=235688838]
+[node name="Player" type="CharacterBody2D" unique_id=235688838]
 collision_mask = 3
 motion_mode = 1
 wall_min_slide_angle = 0.0
@@ -28,10 +28,6 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="RegenTimer" type="Timer" parent="." unique_id=1103765169]
-unique_name_in_owner = true
-autostart = true
-
 [node name="EntityComponent" parent="." unique_id=782134215 instance=ExtResource("4_vd3ux")]
 unique_name_in_owner = true
 entity_name = "Player"
@@ -39,5 +35,3 @@ regen_enabled = true
 
 [node name="EntityUIComponent" parent="." unique_id=2062721715 instance=ExtResource("4_m6685")]
 unique_name_in_owner = true
-
-[connection signal="timeout" from="RegenTimer" to="EntityComponent" method="_on_regen_timer_timeout"]
