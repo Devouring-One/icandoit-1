@@ -47,18 +47,14 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	# Draw health bar
 	if show_health_bar:
 		var health_percent: float = _current_health / _max_health if _max_health > 0.0 else 0.0
 		
-		# Center the bar horizontally
 		var bar_x_offset: float = -health_bar_size.x * 0.5
 		var bar_pos: Vector2 = health_bar_offset + Vector2(bar_x_offset, 0)
 		
-		# Background
 		draw_rect(Rect2(bar_pos, health_bar_size), Color(0.2, 0.2, 0.2, 0.8))
 		
-		# Health bar with color gradient
 		var bar_color: Color = health_bar_color
 		if health_percent > 0.5:
 			bar_color = Color.GREEN.lerp(Color.YELLOW, (1.0 - health_percent) * 2.0)
@@ -68,17 +64,14 @@ func _draw() -> void:
 		var bar_width: float = health_bar_size.x * health_percent
 		draw_rect(Rect2(bar_pos, Vector2(bar_width, health_bar_size.y)), bar_color)
 		
-		# Label with better readability
 		if show_health_label:
 			var label_text: String = "%d / %d" % [int(_current_health), int(_max_health)]
 			var font: Font = ThemeDB.fallback_font
 			var font_size: int = 11
 			
-			# Calculate text width to center it properly
 			var text_width: float = font.get_string_size(label_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
 			var label_pos: Vector2 = health_bar_offset + Vector2(-text_width * 0.5, -4)
 			
-			# Draw black outline (8 directions for better quality)
 			for offset in [
 				Vector2(-1, -1), Vector2(0, -1), Vector2(1, -1),
 				Vector2(-1, 0), Vector2(1, 0),
@@ -86,23 +79,17 @@ func _draw() -> void:
 			]:
 				draw_string(font, label_pos + offset, label_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color.BLACK)
 			
-			# Draw white text on top
 			draw_string(font, label_pos, label_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color.WHITE)
 	
-	# Draw cast bar
 	if show_cast_bar and _is_casting:
-		# Center the cast bar horizontally
 		var cast_x_offset: float = -cast_bar_size.x * 0.5
 		var cast_pos: Vector2 = cast_bar_offset + Vector2(cast_x_offset, 0)
 		
-		# Background
 		draw_rect(Rect2(cast_pos, cast_bar_size), Color(0.2, 0.2, 0.2, 0.8))
 		
-		# Progress
 		var cast_width: float = cast_bar_size.x * _cast_progress
 		draw_rect(Rect2(cast_pos, Vector2(cast_width, cast_bar_size.y)), cast_bar_color)
 	
-	# Draw force debug arrows
 	if show_force_debug and _entity_component:
 		var debug_data: Dictionary = _entity_component.get_debug_snapshot()
 		var thickness: float = 2.0
@@ -128,7 +115,6 @@ func _draw() -> void:
 			if velocity != Vector2.ZERO:
 				draw_line(Vector2.ZERO, velocity * force_scale_factor, Color.CYAN, thickness)
 	elif show_force_debug and not _entity_component:
-		# Debug: draw a small red circle if component is missing
 		draw_circle(Vector2.ZERO, 5.0, Color.RED)
 
 func start_cast(duration: float) -> void:

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Spell" load_steps=8 format=3 uid="uid://c51ohilbff2r"]
+
+[ext_resource type="Script" uid="uid://bedj7vauqtlh5" path="res://Data/Systems/Spell.gd" id="1_cysih"]
+[ext_resource type="PackedScene" uid="uid://c6ec247qqkjyi" path="res://World/Spells/Projectile.tscn" id="1_xlqpc"]
+[ext_resource type="Script" uid="uid://cyjakym6ftikj" path="res://Data/Systems/ProjectileConfig.gd" id="2_sosch"]
+[ext_resource type="Resource" uid="uid://cbcmvn8ef504c" path="res://Data/Resources/Spells/bidirect_cast.tres" id="3_jroa3"]
+[ext_resource type="Script" uid="uid://y37wki2urje6" path="res://Data/Systems/SpellEventConfig.gd" id="3_sosch"]
+
+[sub_resource type="Resource" id="Resource_jroa3"]
+script = ExtResource("2_sosch")
+projectile_count = 10
+omnidirectional = true
+clockwise = false
+metadata/_custom_type_script = "uid://cyjakym6ftikj"
+
+[sub_resource type="Resource" id="Resource_j15k4"]
+script = ExtResource("3_sosch")
+nested_spells = [ExtResource("3_jroa3")]
+metadata/_custom_type_script = "uid://y37wki2urje6"
+
+[resource]
+script = ExtResource("1_cysih")
+behavior = SubResource("Resource_jroa3")
+on_tick = SubResource("Resource_j15k4")
+tick_interval = 0.1
+metadata/_custom_type_script = "uid://bedj7vauqtlh5"

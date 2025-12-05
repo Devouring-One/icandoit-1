@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Spell" load_steps=7 format=3 uid="uid://cbcmvn8ef504c"]
+
+[ext_resource type="Script" uid="uid://bedj7vauqtlh5" path="res://Data/Systems/Spell.gd" id="1_fr54u"]
+[ext_resource type="PackedScene" uid="uid://c6ec247qqkjyi" path="res://World/Spells/Projectile.tscn" id="1_vdkxf"]
+[ext_resource type="Script" uid="uid://cyjakym6ftikj" path="res://Data/Systems/ProjectileConfig.gd" id="2_2mwu1"]
+[ext_resource type="Script" uid="uid://y37wki2urje6" path="res://Data/Systems/SpellEventConfig.gd" id="3_2mwu1"]
+
+[sub_resource type="Resource" id="Resource_cwiga"]
+script = ExtResource("2_2mwu1")
+speed = 100.0
+projectile_count = 2
+spread_angle = 3.141592653589793
+metadata/_custom_type_script = "uid://cyjakym6ftikj"
+
+[sub_resource type="Resource" id="Resource_rhl3x"]
+script = ExtResource("3_2mwu1")
+apply_damage = true
+damage_amount = 5.0
+metadata/_custom_type_script = "uid://y37wki2urje6"
+
+[resource]
+script = ExtResource("1_fr54u")
+name = "bidirtest"
+behavior = SubResource("Resource_cwiga")
+on_hit = SubResource("Resource_rhl3x")
+metadata/_custom_type_script = "uid://bedj7vauqtlh5"

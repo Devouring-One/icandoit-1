@@ -11,7 +11,6 @@ radius = 8.0
 collision_layer = 4
 collision_mask = 3
 script = ExtResource("1")
-debug_draw = true
 
 [node name="ForceReceiver" type="Node" parent="." unique_id=551112343]
 script = ExtResource("3")

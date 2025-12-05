@@ -10,5 +10,10 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if not _entity_component:
 		return
+	
 	velocity = _entity_component.compute_velocity(global_position, false, delta)
-	move_and_slide()
+	
+	var collision := move_and_collide(velocity * delta)
+	if collision:
+		velocity = velocity.bounce(collision.get_normal()) * 0.3
+

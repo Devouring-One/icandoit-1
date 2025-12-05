@@ -43,7 +43,6 @@ func _ready() -> void:
 	_owner_body = get_parent()
 	health = clamp(health, 0.0, max_health)
 	
-	# Setup internal regen timer
 	if regen_enabled:
 		_regen_timer = Timer.new()
 		_regen_timer.wait_time = regen_interval
@@ -152,4 +151,65 @@ func _ensure_forces_updated() -> void:
 		accumulated /= mass
 	_last_forces_velocity = accumulated
 	_last_forces_frame = frame
+
+func apply_push(push_force: Vector2, pusher_mass: float = 1.0, push_duration: float = 0.3) -> void:
+	var resistance := mass / (mass + pusher_mass)
+	var adjusted_force := push_force * (1.0 - resistance)
+	
+	if adjusted_force.length_squared() < 1.0:
+		return
+	
+	var force := Force.new(
+		adjusted_force.normalized(),
+		adjusted_force.length(),
+		push_duration,
+		_owner_body,
+		0.0,
+		Tween.TRANS_QUAD,
+		Tween.EASE_OUT
+	)
+	
+	add_force(force)
+
+func calculate_push_to(other: Node2D, collision_normal: Vector2, my_velocity: Vector2) -> Dictionary:
+	var other_component := EntityComponent.get_from(other)
+	if not other_component:
+		return {"can_push": false}
+	
+	var other_mass := other_component.mass
+	var total_mass := mass + other_mass
+	
+	var my_momentum := my_velocity.length() * mass
+	var push_ratio := mass / total_mass
+	var push_force := -collision_normal * my_momentum * push_ratio * 0.5
+	
+	return {
+		"can_push": true,
+		"push_force": push_force,
+		"my_mass": mass,
+		"other_mass": other_mass,
+		"push_ratio": push_ratio
+	}
+
+func calculate_counter_push(other: Node2D, collision_normal: Vector2, other_velocity: Vector2, min_velocity: float = 10.0) -> Dictionary:
+	if other_velocity.length() < min_velocity:
+		return {"should_push": false}
+	
+	var other_component := EntityComponent.get_from(other)
+	if not other_component:
+		return {"should_push": false}
+	
+	var other_mass := other_component.mass
+	var total_mass := mass + other_mass
+	
+	var other_momentum := other_velocity.length() * other_mass
+	var counter_ratio := other_mass / total_mass
+	var counter_push := collision_normal * other_momentum * counter_ratio * 0.5
+	
+	return {
+		"should_push": true,
+		"counter_push": counter_push,
+		"other_mass": other_mass
+	}
+
 

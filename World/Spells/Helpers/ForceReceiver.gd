@@ -1,8 +1,6 @@
 class_name ForceReceiver
 extends Node
 
-## Lightweight component for objects that can receive forces but don't need full entity features
-
 var forces: Array[Force] = []
 var mass: float = 2.0
 
